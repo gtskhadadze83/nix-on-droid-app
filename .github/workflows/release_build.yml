@@ -1,0 +1,23 @@
+name: Build Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: actions/setup-java@main
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      - shell: bash {0}
+        run: ./gradlew assembleRelease
+        env:
+          TERMUX_PACKAGE_VARIANT: "apt-android-7"
+          TERMUX_APK_VERSION_TAG: "nix"
+      - uses: actions/upload-artifact@main
+        with:
+          path: app/build/outputs/apk/**/*.apk
