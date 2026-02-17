@@ -47,15 +47,22 @@ android {
         implementation project(":termux-shared")
     }
 
+    // NIX-ON-DROID: Downstream version.
     defaultConfig {
         applicationId "com.termux"
+        applicationIdSuffix ".nix"
         minSdk buildMinSdk
         targetSdk buildTargetSdk
-        versionCode 1022
-        versionName "0.119.0-beta.3"
-        
+        versionCode 188037
+        versionName "0.119.0-beta.3_v0.3.7_nix"
+        // fdroid checkupdates looks for literal versionCode/versionName,
+        // can't get fancy with these and use string interpolation and similar
+        ndk {
+          abiFilters 'arm64-v8a', 'x86_64'
+        }
+
         if (appVersionName) versionName = appVersionName
-        validateVersionName(versionName)
+        //validateVersionName(versionName)
 
         buildConfigField "Integer", "TERMUX_APP__BOOTSTRAP_MIN_SDK", project.ext.bootstrapMinSdk.toString()
         buildConfigField "String", "TERMUX_APP__BOOTSTRAP_MIN_RELEASE",
@@ -65,8 +72,8 @@ android {
                 project.ext.bootstrapMaxRelease ? "\"" + project.ext.bootstrapMaxRelease + "\"" : "null"
         buildConfigField "String", "TERMUX_PACKAGE_VARIANT", "\"" + project.ext.packageVariant + "\"" // Used by TermuxApplication class
 
-        manifestPlaceholders.TERMUX_PACKAGE_NAME = "com.termux"
-        manifestPlaceholders.TERMUX_APP_NAME = "Termux"
+        manifestPlaceholders.TERMUX_PACKAGE_NAME = "com.termux.nix"
+        manifestPlaceholders.TERMUX_APP_NAME = "Nix"
         manifestPlaceholders.TERMUX_API_APP_NAME = "Termux:API"
         manifestPlaceholders.TERMUX_BOOT_APP_NAME = "Termux:Boot"
         manifestPlaceholders.TERMUX_FLOAT_APP_NAME = "Termux:Float"
@@ -74,6 +81,7 @@ android {
         manifestPlaceholders.TERMUX_TASKER_APP_NAME = "Termux:Tasker"
         manifestPlaceholders.TERMUX_WIDGET_APP_NAME = "Termux:Widget"
 
+        /* NIX-ON-DROID: Unused
         externalNativeBuild {
             ndkBuild {
                 cFlags "-std=c11", "-Wall", "-Wextra", "-Werror", "-Os", "-fno-stack-protector", "-Wl,--gc-sections"
@@ -87,6 +95,14 @@ android {
                 reset ()
                 include 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
                 universalApk true
+            }
+        }
+        */
+        splits {
+            abi {
+                reset ()
+                include 'arm64-v8a'
+                universalApk false
             }
         }
     }
@@ -120,11 +136,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    /* NIX-ON-DROID: Unused
     externalNativeBuild {
         ndkBuild {
             path "src/main/cpp/Android.mk"
         }
     }
+    */
 
     lint {
         disable 'ProtectedPermissions'
@@ -229,6 +247,7 @@ clean {
     }
 }
 
+/* NIX-ON-DROID: Unused
 task downloadBootstraps() {
     doLast {
         def packageVariant = project.ext.packageVariant
@@ -255,3 +274,4 @@ afterEvaluate {
         variant.javaCompileProvider.get().dependsOn(downloadBootstraps)
     }
 }
+*/
